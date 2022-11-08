@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Final Project</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="term_fragment">term_fragment</string>
+    <string name="term_fragment_label">Terms</string>
+    <string name="create_term_header">Create a new term here!</string>
+    <string name="create_term_title">Title</string>
+    <string name="create_term_start">Starting Date</string>
+    <string name="create_term_end">Ending Date</string>
+    <string name="create_term_button">Create</string>
+    <string name="view">View</string>
+    <string name="delete">Delete</string>
+    <string name="untitled">Untitled</string>
+</resources>
