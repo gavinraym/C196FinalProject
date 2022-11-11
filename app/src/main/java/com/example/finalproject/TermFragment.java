@@ -55,21 +55,19 @@ public class TermFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_term, container, false);
-        titleEditText = view.findViewById(R.id.editTextTermTitle);
-        startEditText = view.findViewById(R.id.editTextStartDate);
-        endEditText = view.findViewById(R.id.editTextEndDate);
-        createTermButton = view.findViewById(R.id.createTermButton);
-        createTermButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                createTermButtonClick();
-            }
-        });
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        titleEditText = view.findViewById(R.id.editTextTermTitle);
+        createTermButton = view.findViewById(R.id.createTermButton);
+        createTermButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                createTermButtonClick();
+            }
+        });
         binding = FragmentTermBinding.inflate(getLayoutInflater());
     }
 
@@ -77,8 +75,6 @@ public class TermFragment extends Fragment {
         Log.d("Term Fragment Activity", "Create term button clicked.");
         Bundle bundle = new Bundle();
         bundle.putString("title", titleEditText.getText().toString());
-//        bundle.putString("start", startEditText.getText().toString());
-//        bundle.putString("end", endEditText.getText().toString());
         ((MainActivity)getActivity()).createNewTerm(bundle);
         Log.d("Term Fragment Activity", "Create term Finished.");
     }

@@ -8,3 +8,5 @@ Next is to implement a call on startup to get all terms from the database.
 Snapshots should be made of all terms. 
 
 After that, the main activity is done!  ?
+
+Next, set up navigation to second view, term view.

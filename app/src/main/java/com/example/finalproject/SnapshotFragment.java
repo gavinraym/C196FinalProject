@@ -10,8 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.example.finalproject.databinding.FragmentSnapshotBinding;
-
 
 public class SnapshotFragment extends Fragment {
 
@@ -19,7 +17,7 @@ public class SnapshotFragment extends Fragment {
     private static final String ARG_PARAM2 = "title";
 
     // TODO: Rename and change types of parameters
-    private String id;
+    public Long id;
     private String title;
     private Fragment selfRef;
 
@@ -42,8 +40,9 @@ public class SnapshotFragment extends Fragment {
         selfRef = this;
         Log.d("Snapshot Fragment","On create.");
         if (getArguments() != null) {
-            id = getArguments().getString(ARG_PARAM1);
-            title = getArguments().getString(ARG_PARAM2);
+            this.id = getArguments().getLong(ARG_PARAM1);
+            Log.d("SnapshotFragment","On Create: id = " + String.valueOf(this.id));
+            this.title = getArguments().getString(ARG_PARAM2);
         }
         Log.d("Snapshot Fragment","Args set.");
     }
@@ -51,9 +50,12 @@ public class SnapshotFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Snapshot Fragment","On create view.");
         View view = inflater.inflate(R.layout.fragment_snapshot, container, false);
+        return view;
+    }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         // Set item button title and onclick.
         Button itemButton = view.findViewById(R.id.ItemButton);
         itemButton.setText(this.title);
@@ -66,14 +68,18 @@ public class SnapshotFragment extends Fragment {
         Button deleteButton = view.findViewById(R.id.DeleteButton);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ((MainActivity)getActivity()).deleteTerm(v);
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .remove(selfRef)
-                        .commit();
+                deleteButtonClick(v);
             }; } );
+    }
 
 
-        Log.d("Snapshot Fragment","On create view finished.");
-        return view;
+    public void deleteButtonClick(View v) {
+        ((MainActivity)getActivity()).deleteTerm(this.id);
+    }
+
+    public void deleteSelf() {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .remove(selfRef)
+                .commit();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.finalproject;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,13 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-
-import org.json.JSONObject;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.sql.Date;
-import java.util.HashMap;
 
 public class DBManager extends SQLiteOpenHelper {
 
@@ -136,7 +130,9 @@ public class DBManager extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-
+    public void setMainActivity(MainActivity activity) {
+        mainActivity = activity;
+    }
 
     public class AddTermTask extends AsyncTask<Bundle, Void, Bundle> {
         protected Bundle doInBackground(Bundle... bundles) {
@@ -144,39 +140,76 @@ public class DBManager extends SQLiteOpenHelper {
             values.put(TermTable.COL_TITLE, bundles[0].getString("title"));
             values.put(TermTable.COL_START, bundles[0].getString("start"));
             values.put(TermTable.COL_END, bundles[0].getString("end"));
-
             //https://developer.android.com/reference/android/database/sqlite/SQLiteOpenHelper
             SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
             Long id = db.insert(TermTable.TABLE, null, values);
             bundles[0].putLong("id",id);
             return bundles[0];
         }
-
         protected void onPostExecute(Bundle bundle) {
             mainActivity.receiveNewTerm(bundle);
         }
-
     }
 
     public void addTerm(Bundle bundle) {
         Log.d("Database.java","Add term.");
         new AddTermTask().execute(bundle);
         Log.d("DBManager", "New thread started to handle add term.");
-
-
     }
-//
-//    public String getTerm() {
-//        Log.d("Database.java", "Getting term");
-//        Cursor cursor = DBManager.db.rawQuery(
-//                "SELECT * FROM " + TermTable.TABLE + " LIMIT 1;",
-//                new String[] {}
-//        );
-//        assert cursor.moveToFirst();
-//        Log.d("Database.java", "Term received.");
-//        return cursor.getString(1);
-//
-//    }
+
+    public class GetTermsTask extends AsyncTask<Integer, Void, Cursor> {
+
+        protected Cursor doInBackground(Integer... inta) {
+            SQLiteDatabase db = DBManager.DBRef.getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                    "SELECT * FROM " + TermTable.TABLE + ";",
+                    new String[] {}
+            );
+            Log.d("Database.java", "Term received.");
+            return cursor;
+        }
+
+        protected void onPostExecute(Cursor cursor) {
+            while (cursor.moveToNext()) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("id", cursor.getLong(0));
+                Log.d("DBManager", "Get Terms Task: id = " + String.valueOf(
+                        bundle.getLong("ID")
+                ));
+                bundle.putString("title", cursor.getString(1));
+                mainActivity.receiveNewTerm(bundle);
+            }
+        }
+    }
+
+    public void getAllTerms() {
+        Log.d("Database.java","Get all terms.");
+        new GetTermsTask().execute(1);
+        Log.d("DBManager", "New thread started to handle getting all terms.");
+    }
+
+    public class DeleteTermTask extends AsyncTask<Long, Void, Void> {
+
+        protected Void doInBackground(Long... idList) {
+
+            String id = String.valueOf(idList[0]);
+            Log.d("DbManager", String.valueOf(id));
+            //Check for courses associated with this term before deleting
+
+            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+            int result = db.delete(TermTable.TABLE, TermTable.COL_ID+"="+ id, null);
+            Log.d("Database.java", "Term deleted. result = " + String.valueOf(result));
+            mainActivity.confirmDelete(id);
+            return null;
+        }
+    }
+
+    public void deleteTerm(Long id) {
+        Long[] idList = new Long[] { id};
+        DeleteTermTask task = new DeleteTermTask();
+        task.execute(idList);
+    }
+
 
 
 }
