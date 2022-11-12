@@ -62,7 +62,7 @@ public class SnapshotFragment extends Fragment {
 
         itemButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ((MainActivity)getActivity()).detailTerm(v); }; } );
+                detailRedirect(); }; } );
 
         // deleteButton set onclick
         Button deleteButton = view.findViewById(R.id.DeleteButton);
@@ -81,5 +81,9 @@ public class SnapshotFragment extends Fragment {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .remove(selfRef)
                 .commit();
+    }
+
+    private void detailRedirect() {
+        ((MainActivity)getActivity()).showTermDetails(this.id);
     }
 }

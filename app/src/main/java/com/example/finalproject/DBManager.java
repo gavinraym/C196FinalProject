@@ -16,6 +16,7 @@ public class DBManager extends SQLiteOpenHelper {
     private static final int VERSION = 2;
     private static DBManager DBRef;
     private MainActivity mainActivity;
+    private TermActivity termActivity;
 
 
     public static DBManager getInstance(Context context) {
@@ -115,7 +116,6 @@ public class DBManager extends SQLiteOpenHelper {
 
     }
 
-
     @Override
     public void onUpgrade(SQLiteDatabase db,
                           int oldVersion,
@@ -133,6 +133,7 @@ public class DBManager extends SQLiteOpenHelper {
     public void setMainActivity(MainActivity activity) {
         mainActivity = activity;
     }
+    public void setTermActivity(TermActivity activity) { termActivity = activity; }
 
     public class AddTermTask extends AsyncTask<Bundle, Void, Bundle> {
         protected Bundle doInBackground(Bundle... bundles) {
@@ -188,12 +189,45 @@ public class DBManager extends SQLiteOpenHelper {
         Log.d("DBManager", "New thread started to handle getting all terms.");
     }
 
+    public class GetTermDataTask extends AsyncTask<Long, Void, Cursor> {
+        protected Cursor doInBackground(Long... inta) {
+            Long id = inta[0];
+            SQLiteDatabase db = DBManager.DBRef.getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                    "SELECT * FROM " + TermTable.TABLE +
+                            " WHERE " + TermTable.COL_ID + " = " + id + ";",
+                    new String[] {}
+            );
+            Log.d("Database.java", "Term received.");
+            return cursor;
+        }
+
+        protected void onPostExecute(Cursor cursor) {
+            while (cursor.moveToNext()) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("id", cursor.getLong(0));
+                bundle.putString("title", cursor.getString(1));
+                bundle.putString("start", cursor.getString(2));
+                bundle.putString("end", cursor.getString(3));
+                Log.d("DBManager", "Get Term data Task: id = " + String.valueOf(
+                        bundle.getLong("ID")
+                ));
+
+                termActivity.receiveTermData(bundle);
+            }
+        }
+    }
+
+    public void getTermData(Long id) {
+        new GetTermDataTask().execute(id);
+    }
+
     public class DeleteTermTask extends AsyncTask<Long, Void, Void> {
 
         protected Void doInBackground(Long... idList) {
 
             String id = String.valueOf(idList[0]);
-            Log.d("DbManager", String.valueOf(id));
+            Log.d("DbManager", id);
             //Check for courses associated with this term before deleting
 
             SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
@@ -209,6 +243,39 @@ public class DBManager extends SQLiteOpenHelper {
         DeleteTermTask task = new DeleteTermTask();
         task.execute(idList);
     }
+
+    public class UpdateTermDataTask extends AsyncTask<Bundle,Void, Integer> {
+        protected Integer doInBackground(Bundle... params) {
+            Bundle bundle = params[0];
+            ContentValues values = new ContentValues();
+            values.put(TermTable.COL_ID, bundle.getString("id"));
+            values.put(TermTable.COL_TITLE, bundle.getString("title"));
+            values.put(TermTable.COL_START, bundle.getString("start"));
+            values.put(TermTable.COL_END, bundle.getString("end"));
+            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+            Integer result =  db.update(
+                    TermTable.TABLE,
+                    values,
+                    TermTable.COL_ID + "=?",
+                    new String[] { bundle.getString("id") }
+            );
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Integer rows) {
+            termDataSaveReturnResult(rows);
+        }
+    }
+
+    public void updateTermData(Bundle bundle) {
+        new UpdateTermDataTask().execute(new Bundle[] { bundle });
+    }
+
+    public void termDataSaveReturnResult(int result) {
+        termActivity.verifySave(result);
+    }
+
 
 
 

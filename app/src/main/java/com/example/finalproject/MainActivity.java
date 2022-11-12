@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,13 +25,6 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             DBManager.getInstance(this).getAllTerms();
         }
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        // Get all terms and display snapshots
-
     }
 
     public void createNewTerm(Bundle bundle) {
@@ -65,7 +59,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity","Detail term");
     }
 
-
+    public void showTermDetails(Long id) {
+        Intent detailIntent = new Intent(this, TermActivity.class);
+        detailIntent.putExtra("com.example.finalproject.term_id",id);
+        Log.d("MainActivity","Show term details, id = " + String.valueOf(id));
+        startActivity(detailIntent);
+    }
 
 
 }

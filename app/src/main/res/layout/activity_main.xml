@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/termFragmentContainerView"
+            android:id="@+id/courseFragmentContainerView"
             android:name="com.example.finalproject.TermFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

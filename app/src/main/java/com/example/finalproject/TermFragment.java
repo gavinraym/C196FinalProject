@@ -31,8 +31,6 @@ public class TermFragment extends Fragment {
 
     //UI elements
     private EditText titleEditText;
-    private EditText startEditText;
-    private EditText endEditText;
     private Button createTermButton;
 
     public TermFragment() {
