@@ -44,33 +44,16 @@ public class TermActivity extends AppCompatActivity {
         this.termId = extras.getLong("com.example.finalproject.term_id");
         if (savedInstanceState == null) {
             DBManager.getInstance(this).getTermData(this.termId);
+            DBManager.getInstance(this).getAllCoursesData(this.termId);
         }
-
-        Log.d("TermActivity","Retrieved term_id:" + String.valueOf(this.termId));
-
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_term);
-//        Log.d("TermActivity","Nav controller found.");
-//        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         Log.d("TermActivity","On create finished.");
     }
 
-//    @Override
-//    public boolean onSupportNavigateUp() {
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_term);
-//        return NavigationUI.navigateUp(navController, appBarConfiguration)
-//                || super.onSupportNavigateUp();
-//    }
+
 
     public void setTermDetailFragment(TermDetailFragment fragment) {
         this.termDetailFragment = fragment;
         Log.d("TermActivity","Set term detail fragment finished.");
-    }
-
-    public void createNewCourse(Bundle bundle) {
-        Log.d("MainActivity","Create new term");
-        //DBManager.getInstance(this).addTerm(bundle);
-        Log.d("MainActivity","Create new term finished");
     }
 
     public void requestTermData() {
@@ -120,5 +103,35 @@ public class TermActivity extends AppCompatActivity {
 
     public void requestAddCourseToTerm() {
         Log.d("TermActivity","Request add course to term");
+        DBManager.getInstance(this).addCourseToTerm(this.termId);
+    }
+
+    public void receiveNewCourse(Bundle bundle) {
+        Log.d("TermActivity", "Receive new course. id:" + bundle.getLong("id"));
+        String tag = "course_snapshot_" + String.valueOf(bundle.getLong("id"));
+
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .add(R.id.snapshotLinearLayout, CourseSnapshotFragment.class, bundle, tag)
+                .commit();
+        Log.d("MainActivity", "Receive new term finished.");
+    }
+
+    public void deleteCourse(Long id) {
+        Log.d("TermActivity","Delete course.");
+        DBManager.getInstance(this).deleteCourse(id);
+    }
+
+    public void confirmDelete(String id) {
+        String tag = "course_snapshot_" + id;
+        ((CourseSnapshotFragment) getSupportFragmentManager().findFragmentByTag(tag))
+                .deleteSelf();
+    }
+
+    public void showCourseDetails(Long id) {
+        Intent detailIntent = new Intent(this, CourseActivity.class);
+        detailIntent.putExtra("com.example.finalproject.course_id",id);
+        Log.d("TermActivity","Show Course details, id = " + String.valueOf(id));
+        startActivity(detailIntent);
     }
 }

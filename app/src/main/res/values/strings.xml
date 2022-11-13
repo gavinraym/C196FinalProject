@@ -30,4 +30,22 @@
 
     <string name="term_appbar_title">Term Details</string>
     <string name="back">Back</string>
+
+    <string name="title_activity_course">CourseActivity</string>
+    <string name="course_detail_header">Edit course data here:</string>
+    <string name="course_additions_header">Add assessments and notes:</string>
+    <string name="course_title">Title:</string>
+    <string name="course_start">Start date:</string>
+    <string name="course_end">End date:</string>
+    <string name="course_status">Status:</string>
+    <string name="course_name">Instructor:</string>
+    <string name="course_phone">Phone:</string>
+    <string name="course_email">Email:</string>
+    <string-array name="course_status_options">
+        <item>In Progress</item>
+        <item>Dropped</item>
+        <item>Plan to Take</item>
+    </string-array>
+    <string name="add_assmnt">+Assmnt</string>
+    <string name="add_note">+Note</string>
 </resources>

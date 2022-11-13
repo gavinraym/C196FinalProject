@@ -17,6 +17,7 @@ public class DBManager extends SQLiteOpenHelper {
     private static DBManager DBRef;
     private MainActivity mainActivity;
     private TermActivity termActivity;
+    private CourseActivity courseActivity;
 
 
     public static DBManager getInstance(Context context) {
@@ -45,9 +46,9 @@ public class DBManager extends SQLiteOpenHelper {
         private static final String COL_ID = "courds_id";
         private static final String COL_TERM = "course_term";
         private static final String COL_TITLE = "course_title";
-        private static final String COL_STATUS = "course_status";
         private static final String COL_START = "course_start";
         private static final String COL_END = "course_end";
+        private static final String COL_STATUS = "course_status";
         private static final String COL_NAME = "course_name";
         private static final String COL_PHONE = "course_phone";
         private static final String COL_EMAIL = "course_email";
@@ -82,7 +83,7 @@ public class DBManager extends SQLiteOpenHelper {
         db.execSQL(
                 "CREATE TABLE " + CourseTable.TABLE + "(" +
                         CourseTable.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        CourseTable.COL_TERM + " INTEGER , " +
+                        CourseTable.COL_TERM + " INTEGER, " +
                         CourseTable.COL_TITLE + " TEXT, " +
                         CourseTable.COL_START + " DATE, " +
                         CourseTable.COL_END + " DATE, " +
@@ -134,6 +135,7 @@ public class DBManager extends SQLiteOpenHelper {
         mainActivity = activity;
     }
     public void setTermActivity(TermActivity activity) { termActivity = activity; }
+    public void setCourseActivity(CourseActivity activity) {courseActivity = activity;}
 
     public class AddTermTask extends AsyncTask<Bundle, Void, Bundle> {
         protected Bundle doInBackground(Bundle... bundles) {
@@ -276,7 +278,147 @@ public class DBManager extends SQLiteOpenHelper {
         termActivity.verifySave(result);
     }
 
+    public class AddCourseTask extends AsyncTask<Bundle, Void, Bundle> {
+        protected Bundle doInBackground(Bundle... bundles) {
+            ContentValues values = new ContentValues();
+            values.put(CourseTable.COL_TITLE, "New Course");
+            values.put(CourseTable.COL_TERM, bundles[0].getLong("term_id"));
+            //https://developer.android.com/reference/android/database/sqlite/SQLiteOpenHelper
+            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+            Long id = db.insert(CourseTable.TABLE, null, values);
+            bundles[0].putLong("id",id);
+            bundles[0].putString("title", "New Course");
+            return bundles[0];
+        }
+        protected void onPostExecute(Bundle bundle) {
+            termActivity.receiveNewCourse(bundle);
+        }
+    }
 
+    public void addCourseToTerm(Long termId) {
+        Log.d("DBManager","Add course to term");
+        Bundle bundle = new Bundle();
+        bundle.putLong("term_id", termId);
+        new AddCourseTask().execute(new Bundle[] {bundle});
+    }
 
+    public class DeleteCourseTask extends AsyncTask<Long, Void, Void> {
+
+        protected Void doInBackground(Long... idList) {
+
+            String id = String.valueOf(idList[0]);
+            //Check for courses associated with this term before deleting
+
+            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+            int result = db.delete(CourseTable.TABLE, CourseTable.COL_ID+"="+ id, null);
+            Log.d("Database.java", "Course deleted. result = " + String.valueOf(result));
+            termActivity.confirmDelete(id);
+            return null;
+        }
+    }
+
+    public void deleteCourse(Long id) {
+        Log.d("DBManager","Delete course.");
+        new DeleteCourseTask().execute(new Long[] { id } );
+    }
+
+    public class GetCoursesTask extends AsyncTask<Long, Void, Cursor> {
+
+        protected Cursor doInBackground(Long... params) {
+            Long term_id = params[0];
+            SQLiteDatabase db = DBManager.DBRef.getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                    "SELECT * FROM " + CourseTable.TABLE +
+                            " WHERE " + CourseTable.COL_TERM + "="+term_id+  ";",
+                    new String[] {}
+            );
+            Log.d("Database.java", "Term received.");
+            return cursor;
+        }
+
+        protected void onPostExecute(Cursor cursor) {
+            while (cursor.moveToNext()) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("id", cursor.getLong(0));
+                Log.d("DBManager", "Get Courses Task: id = " + String.valueOf(
+                        bundle.getLong("ID")
+                ));
+                bundle.putString("title", cursor.getString(2 ));
+                termActivity.receiveNewCourse(bundle);
+            }
+        }
+    }
+
+    public void getAllCoursesData(Long termId) {
+        new GetCoursesTask().execute(termId);
+    }
+
+    public class GetCourseDataTask extends AsyncTask<Long, Void, Cursor> {
+        protected Cursor doInBackground(Long... inta) {
+            Long id = inta[0];
+            SQLiteDatabase db = DBManager.DBRef.getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                    "SELECT * FROM " + CourseTable.TABLE +
+                            " WHERE " + CourseTable.COL_ID + " = " + id + ";",
+                    new String[]{}
+            );
+            Log.d("Database.java", "Term received.");
+            return cursor;
+        }
+
+        protected void onPostExecute(Cursor cursor) {
+            while (cursor.moveToNext()) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("id", cursor.getLong(0));
+                bundle.putString("title", cursor.getString(2));
+                bundle.putString("start", cursor.getString(3));
+                bundle.putString("end", cursor.getString(4));
+                bundle.putString("status", cursor.getString(5));
+                bundle.putString("name", cursor.getString(6));
+                bundle.putString("phone", cursor.getString(7));
+                bundle.putString("email", cursor.getString(8));
+                Log.d("DBManager", "Get Term data Task: id = " + String.valueOf(
+                        bundle.getLong("ID")
+                ));
+
+                courseActivity.updateCourseDetailFragment(bundle);
+            }
+        }
+    }
+
+    public void getCourseData(Long courseId) {
+        new GetCourseDataTask().execute(courseId);
+    }
+
+    public class UpdateCourseDataTask extends AsyncTask<Bundle,Void, Integer> {
+        protected Integer doInBackground(Bundle... params) {
+            Bundle bundle = params[0];
+            ContentValues values = new ContentValues();
+            values.put(CourseTable.COL_ID, bundle.getString("id"));
+            values.put(CourseTable.COL_TITLE, bundle.getString("title"));
+            values.put(CourseTable.COL_START, bundle.getString("start"));
+            values.put(CourseTable.COL_END, bundle.getString("end"));
+            values.put(CourseTable.COL_STATUS, bundle.getString("status"));
+            values.put(CourseTable.COL_NAME, bundle.getString("name"));
+            values.put(CourseTable.COL_PHONE, bundle.getString("phone"));
+            values.put(CourseTable.COL_EMAIL, bundle.getString("email"));
+            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+            Integer result =  db.update(
+                    CourseTable.TABLE,
+                    values,
+                    CourseTable.COL_ID + "=?",
+                    new String[] { bundle.getString("id") }
+            );
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Integer rows) {
+            termDataSaveReturnResult(rows);
+        }
+    }
+    public void updateCourseData(Bundle bundle) {
+
+    }
 
 }
