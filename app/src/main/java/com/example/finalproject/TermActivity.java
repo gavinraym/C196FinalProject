@@ -1,25 +1,18 @@
 package com.example.finalproject;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.snackbar.Snackbar;
-
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.example.finalproject.databinding.ActivityTermBinding;
 
@@ -42,14 +35,26 @@ public class TermActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         this.termId = extras.getLong("com.example.finalproject.term_id");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
         if (savedInstanceState == null) {
             DBManager.getInstance(this).getTermData(this.termId);
-            DBManager.getInstance(this).getAllCoursesData(this.termId);
         }
         Log.d("TermActivity","On create finished.");
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("TermActivity","On pause.");
+        ((LinearLayout) findViewById(R.id.snapshotLinearLayout)).removeAllViews();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        DBManager.getInstance(this).getAllCoursesData(this.termId);
+    }
 
     public void setTermDetailFragment(TermDetailFragment fragment) {
         this.termDetailFragment = fragment;
@@ -93,12 +98,6 @@ public class TermActivity extends AppCompatActivity {
         }
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    public void backButtonClick(View view) {
-        Log.d("TermActivity","Back button click.");
-        Intent detailIntent = new Intent(this,MainActivity.class);
-        startActivity(detailIntent);
     }
 
     public void requestAddCourseToTerm() {

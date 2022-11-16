@@ -12,7 +12,7 @@
     <string name="view">View</string>
     <string name="delete">Delete</string>
     <string name="untitled">Untitled</string>
-    <string name="title_activity_term">TermActivity</string>
+    <string name="title_activity_term">Term Detail View</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
@@ -31,7 +31,7 @@
     <string name="term_appbar_title">Term Details</string>
     <string name="back">Back</string>
 
-    <string name="title_activity_course">CourseActivity</string>
+    <string name="title_activity_course">Course Detail View</string>
     <string name="course_detail_header">Edit course data here:</string>
     <string name="course_additions_header">Add assessments and notes:</string>
     <string name="course_title">Title:</string>
@@ -46,6 +46,12 @@
         <item>Dropped</item>
         <item>Plan to Take</item>
     </string-array>
+    <string-array name="assmnt_types">
+        <item>O</item>
+        <item>p</item>
+    </string-array>
     <string name="add_assmnt">+Assmnt</string>
     <string name="add_note">+Note</string>
+    <string name="set_alert">Set Alert</string>
+    <string name="send_sms">Send SMS</string>
 </resources>

@@ -26,21 +26,17 @@ public class CourseDetailFragment extends Fragment {
     private EditText nameEditText;
     private EditText phoneEditText;
     private EditText emailEditText;
-    private Button saveCourseButton;
-    private Button addAssmntButton;
-    private Button addNoteButton;
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
         binding = FragmentCourseDetailBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
+    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ((CourseActivity)getActivity()).setCourseDetailFragment(this);
@@ -51,12 +47,21 @@ public class CourseDetailFragment extends Fragment {
         nameEditText = view.findViewById(R.id.editNameText);
         phoneEditText = view.findViewById(R.id.editPhoneText);
         emailEditText = view.findViewById(R.id.editEmailText);
-        saveCourseButton = view.findViewById(R.id.saveCourseButton);
-        addAssmntButton = view.findViewById(R.id.addAssmntButton);
-        addNoteButton = view.findViewById(R.id.addNoteButton);
         binding.saveCourseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { saveCourseButtonClick(view); }
+        });
+        binding.addAssmntButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((CourseActivity)getActivity()).createNewAssmnt();
+            }
+        });
+        binding.addNoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((CourseActivity)getActivity()).createNewNote();
+            }
         });
     }
 
@@ -72,7 +77,7 @@ public class CourseDetailFragment extends Fragment {
         bundle.putString("title", titleEditText.getText().toString());
         bundle.putString("start",startEditText.getText().toString());
         bundle.putString("end",endEditText.getText().toString());
-        bundle.putString("status",String.valueOf(statusSpinner.getSelectedItemPosition()));
+        bundle.putInt("status",statusSpinner.getSelectedItemPosition());
         bundle.putString("name",nameEditText.getText().toString());
         bundle.putString("phone",phoneEditText.getText().toString());
         bundle.putString("email",emailEditText.getText().toString());
@@ -80,17 +85,21 @@ public class CourseDetailFragment extends Fragment {
     }
 
     public void refreshCourseData(Bundle bundle) {
+        Log.d("CourseDetailFragment","Refresh course data:" + bundle.getString("title"));
         titleEditText.setText(bundle.getString("title"));
         startEditText.setText(bundle.getString("start"));
         endEditText.setText(bundle.getString("end"));
         try {
-            statusSpinner.setSelection(Integer.valueOf(bundle.getString("status")));
+            statusSpinner.setSelection(bundle.getInt("status"));
         } catch (Exception e) {
+            Log.d("CourseDetailFragment","Refresh course data exception caught.");
             statusSpinner.setSelection(0);
         }
         nameEditText.setText(bundle.getString("name"));
         phoneEditText.setText(bundle.getString("phone"));
         emailEditText.setText(bundle.getString("email"));
     }
+
+
 
 }

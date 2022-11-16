@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +23,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DBManager.getInstance(this).setMainActivity(this);
-        if (savedInstanceState == null) {
-            DBManager.getInstance(this).getAllTerms();
-        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("TermActivity","On pause.");
+        ((LinearLayout) findViewById(R.id.snapshotLinearLayout)).removeAllViews();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        DBManager.getInstance(this).getAllTerms();
     }
 
     public void createNewTerm(Bundle bundle) {

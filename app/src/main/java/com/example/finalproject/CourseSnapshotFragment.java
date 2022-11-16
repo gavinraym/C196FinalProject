@@ -101,4 +101,6 @@ public class CourseSnapshotFragment extends Fragment {
         binding = null;
     }
 
+
+
 }
