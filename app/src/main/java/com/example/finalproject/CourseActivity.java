@@ -15,8 +15,6 @@ public class CourseActivity extends AppCompatActivity {
     private ActivityCourseBinding binding;
     private Long courseId;
     private CourseDetailFragment courseDetailFragment;
-    private AssessmnentFragment assessmnentFragment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,20 +53,24 @@ public class CourseActivity extends AppCompatActivity {
     public void courseDataSaveReturnResults(Integer affectedRows) {
         Log.d("CourseActivity","Course data save return results.");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         if (affectedRows == 1) {
             Log.d("CourseActivity", "Course data saved successfully.");
-            builder.setMessage("Course data saved successfully");
+            courseDetailFragment.setAlert();
         }
         else {
             Log.d("CourseActivity", "Course data did not save.");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Ut oh! Course data was not saved." +
                     " Please ensure all entries are correct. Dates can use" +
                     " this format: yyyy-dd-mm (2022-01-07)");
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
-        AlertDialog dialog = builder.create();
-        dialog.show();
+
     }
+
+
 
     public void createNewNote() {
         Log.d("CourseActivity", "Create new Note.");

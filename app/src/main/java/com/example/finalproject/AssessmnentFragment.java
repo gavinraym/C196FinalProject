@@ -1,20 +1,19 @@
 package com.example.finalproject;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-
 import com.example.finalproject.databinding.FragmentAssessmnentBinding;
-import com.example.finalproject.databinding.FragmentCourseDetailBinding;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -104,10 +103,30 @@ public class AssessmnentFragment extends Fragment {
         bundle.putString("end",binding.editAssmntDate.getText().toString());
         Log.d("AssmntFragment", "Save button click.");
         ((CourseActivity)getActivity()).receiveAssmentDataForDB(bundle);
+
+
     }
 
     public void alertButtonClick(View view) {
         Log.d("AssmntFragment", "Alert button click.");
+        String message;
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-mm");
+            Calendar date = Calendar.getInstance();
+            date.setTime(formatter.parse(binding.editAssmntDate.getText().toString()));
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "0")
+                    .setContentTitle("An assessment is due today!")
+                    .setContentText(this.title)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                    .setWhen(date.getTimeInMillis());
+            message = "Notification set.";
+        } catch (Exception e) {
+            message = "Cannot set alert; try formatting date as yyyy-dd-mm.";
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(message);
+        builder.create().show();
     }
 
     public void deleteButtonClick(View view) {
