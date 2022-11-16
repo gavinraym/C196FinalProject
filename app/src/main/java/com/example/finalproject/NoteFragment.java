@@ -1,6 +1,9 @@
 package com.example.finalproject;
 
+import static java.net.Proxy.Type.HTTP;
+
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +16,8 @@ import android.view.ViewGroup;
 
 import com.example.finalproject.databinding.FragmentAssessmnentBinding;
 import com.example.finalproject.databinding.FragmentNoteBinding;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,10 +98,12 @@ public class NoteFragment extends Fragment {
     }
 
     public void smsButtonClick(View view) {
-        Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
-        sendIntent.putExtra(this.title, "No note found.");
+        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
         sendIntent.setType("vnd.android-dir/mms-sms");
-        startActivity(sendIntent);
+        sendIntent.putExtra("sms_body",this.title);
+        startActivity(
+                Intent.createChooser(
+                sendIntent, "Which app should be used?"));
     }
 
     public void deleteButtonClick(View view) {
