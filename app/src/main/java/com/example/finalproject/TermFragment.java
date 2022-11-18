@@ -1,5 +1,6 @@
 package com.example.finalproject;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -76,4 +77,5 @@ public class TermFragment extends Fragment {
         ((MainActivity)getActivity()).createNewTerm(bundle);
         Log.d("Term Fragment Activity", "Create term Finished.");
     }
+
 }

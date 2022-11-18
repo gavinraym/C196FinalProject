@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         CharSequence name = "Main Channel";
         String description = "One channel to rule them all.";
         int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel("0", name, importance);
+        NotificationChannel channel = new NotificationChannel("Main Channel", name, importance);
         channel.setDescription(description);
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
@@ -38,15 +39,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Log.d("TermActivity","On pause.");
-        ((LinearLayout) findViewById(R.id.snapshotLinearLayout)).removeAllViews();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
+        ((LinearLayout) findViewById(R.id.snapshotLinearLayout)).removeAllViews();
         DBManager.getInstance(this).getAllTerms();
     }
 
@@ -89,5 +84,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(detailIntent);
     }
 
-
+    public void alertNoTermDelete() {
+        Log.d("MainActivity","Alert no term delete.");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("This term still contains courses, and therefore " +
+                "cannot be deleted. Please delete all courses and try again.");
+        builder.create().show();
+    }
 }

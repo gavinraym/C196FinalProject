@@ -1,19 +1,26 @@
 package com.example.finalproject;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.core.app.NotificationCompat;
+
 public class DBManager extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "movies.db";
-    private static final int VERSION = 4;
+    private static final int VERSION = 5;
     private static DBManager DBRef;
     private MainActivity mainActivity;
     private TermActivity termActivity;
@@ -70,6 +77,12 @@ public class DBManager extends SQLiteOpenHelper {
         private static final String COL_TITLE = "note_title";
     }
 
+    private static final class NotificationTable {
+        private static final String TABLE = "Notifications";
+        private static final String COL_ID = "notify_id";
+        private static final String COL_TITLE = "notify_title";
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("Database.java", "onCreate 1");
@@ -116,6 +129,11 @@ public class DBManager extends SQLiteOpenHelper {
                         "REFERENCES " + CourseTable.TABLE + "(" + CourseTable.COL_ID + ")) "
         );
 
+        db.execSQL(
+                "CREATE TABLE " + NotificationTable.TABLE + "(" +
+                        NotificationTable.COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        NotificationTable.COL_TITLE + " TEXT);"
+        );
 
     }
 
@@ -226,19 +244,38 @@ public class DBManager extends SQLiteOpenHelper {
         new GetTermDataTask().execute(id);
     }
 
-    public class DeleteTermTask extends AsyncTask<Long, Void, Void> {
+    public class DeleteTermTask extends AsyncTask<Long, Void, Boolean> {
 
-        protected Void doInBackground(Long... idList) {
+        protected Boolean doInBackground(Long... idList) {
 
             String id = String.valueOf(idList[0]);
             Log.d("DbManager", id);
             //Check for courses associated with this term before deleting
 
-            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
-            int result = db.delete(TermTable.TABLE, TermTable.COL_ID+"="+ id, null);
-            Log.d("Database.java", "Term deleted. result = " + String.valueOf(result));
-            mainActivity.confirmDelete(id);
-            return null;
+            SQLiteDatabase readDB = DBManager.DBRef.getReadableDatabase();
+
+            Cursor cursor = readDB.rawQuery(
+                    "SELECT COUNT(*) FROM " + CourseTable.TABLE +
+                            " WHERE " + CourseTable.COL_TERM + "="+id+";",
+                    new String[] {}
+            );
+            cursor.moveToFirst();
+            if (cursor.getInt(0) > 0) {
+                return false;
+            } else {
+                cursor.close();
+                SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+                int result = db.delete(TermTable.TABLE, TermTable.COL_ID+"="+ id, null);
+                Log.d("Database.java", "Term deleted. result = " + String.valueOf(result));
+                mainActivity.confirmDelete(id);
+                return true;
+            }
+        }
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (!result) {
+                mainActivity.alertNoTermDelete();
+            }
         }
     }
 
@@ -414,6 +451,7 @@ public class DBManager extends SQLiteOpenHelper {
                     CourseTable.COL_ID + "=?;",
                     new String[] { String.valueOf(bundle.getLong("id")) }
             );
+            bundle.putInt("saveResult",result);
             return result;
         }
 
@@ -433,7 +471,8 @@ public class DBManager extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(AssmtTable.COL_COURSE, bundles[0].getLong("courseId"));
             values.put(AssmtTable.COL_TYPE, 0);
-            values.put(AssmtTable.COL_TITLE, "title");
+            values.put(AssmtTable.COL_TITLE, "Title");
+            values.put(AssmtTable.COL_END,"Due Date");
             SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
             Long id = db.insert(AssmtTable.TABLE, null, values);
             bundles[0].putLong("id",id);
@@ -451,7 +490,7 @@ public class DBManager extends SQLiteOpenHelper {
         new AddAssmntTask().execute(bundle);
     }
 
-    public class UpdateAssmntTask extends AsyncTask<Bundle, Void, Integer> {
+    private class UpdateAssmntTask extends AsyncTask<Bundle, Void, Integer> {
         protected Integer doInBackground(Bundle... bundles) {
             ContentValues values = new ContentValues();
             values.put(AssmtTable.COL_TYPE, bundles[0].getInt("type"));
@@ -470,6 +509,9 @@ public class DBManager extends SQLiteOpenHelper {
         }
 
         protected void onPostExecute(Integer i) {
+
+
+
             courseActivity.courseDataSaveReturnResults(i);
         }
     }
@@ -543,7 +585,7 @@ public class DBManager extends SQLiteOpenHelper {
         protected Bundle doInBackground(Bundle... bundles) {
             ContentValues values = new ContentValues();
             values.put(NoteTable.COL_COURSE, bundles[0].getLong("courseId"));
-            values.put(NoteTable.COL_TITLE, "title");
+            values.put(NoteTable.COL_TITLE, "Note message.");
             SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
             Long id = db.insert(NoteTable.TABLE, null, values);
             bundles[0].putLong("id",id);
@@ -635,5 +677,42 @@ public class DBManager extends SQLiteOpenHelper {
     public void deleteNote(Long id) {
         Log.d("DBManager","Delete Note." + String.valueOf(id));
         new DeleteNoteTask().execute(new Long[] { id } );
+    }
+
+    public class CreateNewNotification extends AsyncTask<Bundle, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Bundle... bundle) {
+            ContentValues values = new ContentValues();
+            values.put(NotificationTable.COL_TITLE, bundle[0].getString("message"));
+            SQLiteDatabase db = DBManager.DBRef.getWritableDatabase();
+            Long id = db.insert(NotificationTable.TABLE, null, values);
+            Log.d("DBManager", "Get notification id:" + String.valueOf(id));
+            Intent intent = new Intent(courseActivity.getApplicationContext(), NotificationBroadcast.class);
+            intent.putExtra("title", bundle[0].getString("title"));
+            intent.putExtra("message", bundle[0].getString("message"));
+            intent.putExtra("notifyAt", bundle[0].getLong("notifyAt"));
+            intent.putExtra("id",id.intValue());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    courseActivity.getApplicationContext(), id.intValue(), intent,
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            AlarmManager alarmManager = (AlarmManager) courseActivity
+                    .getSystemService(Context.ALARM_SERVICE);
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP, bundle[0].getLong("notifyAt"), pendingIntent );
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            Log.d("DBManager","On post execute schedule notification");
+        }
+    }
+
+    public void scheduleNotification(Bundle bundle) {
+        Log.d("DBManager","Schedule notification.");
+        new CreateNewNotification().execute(bundle);
+
     }
 }

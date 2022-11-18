@@ -22,6 +22,15 @@
             android:layout_weight="1"
             />
 
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".1"
+            android:background="#1A224C"
+            android:paddingVertical="5dp"
+            android:src="@android:drawable/divider_horizontal_textfield" />
+
         <ScrollView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -29,10 +38,32 @@
             >
 
             <LinearLayout
-                android:id="@+id/snapshotLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/term_list_description"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <TextView
+                    android:id="@+id/textView13"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/term_list_header"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+                <LinearLayout
+                    android:id="@+id/snapshotLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+            </LinearLayout>
         </ScrollView>
 
     </LinearLayout>

@@ -3,52 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:visibility="visible"
-    tools:context=".MainActivity"
-    tools:visibility="visible">
-
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/courseFragmentContainerView"
-            android:name="com.example.finalproject.TermFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:id="@+id/fragmentContainerView"
+            android:name="com.example.finalproject.TermDetailFragment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#1A224C"
-            android:paddingVertical="5dp"
-            android:src="@android:drawable/divider_horizontal_textfield"
-            tools:visibility="invisible" />
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#1A224C"
-            android:paddingVertical="5dp"
-            android:src="@android:drawable/divider_horizontal_textfield"
-            tools:visibility="invisible" />
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/imageView11"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".1"
             android:background="#1A224C"
             android:paddingVertical="5dp"
             android:src="@android:drawable/divider_horizontal_textfield" />
 
         <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -56,26 +37,24 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textView15"
+                    android:id="@+id/textView20"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/term_list_header"
+                    android:text="@string/class_list_header"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
                 <TextView
-                    android:id="@+id/textView16"
+                    android:id="@+id/textView19"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/term_list_description"
+                    android:text="@string/class_list_description"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
                 <LinearLayout
                     android:id="@+id/snapshotLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                </LinearLayout>
+                    android:orientation="vertical" />
             </LinearLayout>
         </ScrollView>
 

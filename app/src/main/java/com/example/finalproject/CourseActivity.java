@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import android.util.Log;
 
@@ -52,25 +54,21 @@ public class CourseActivity extends AppCompatActivity {
 
     public void courseDataSaveReturnResults(Integer affectedRows) {
         Log.d("CourseActivity","Course data save return results.");
-
-
+        String message;
         if (affectedRows == 1) {
             Log.d("CourseActivity", "Course data saved successfully.");
-            courseDetailFragment.setAlert();
+            message = "Course was updated successfully";
         }
         else {
             Log.d("CourseActivity", "Course data did not save.");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Ut oh! Course data was not saved." +
-                    " Please ensure all entries are correct. Dates can use" +
-                    " this format: yyyy-dd-mm (2022-01-07)");
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            message = "Ut oh! Course data was not saved." +
+                    " Please ensure all entries are correct.";
         }
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
-
-
 
     public void createNewNote() {
         Log.d("CourseActivity", "Create new Note.");
@@ -143,4 +141,6 @@ public class CourseActivity extends AppCompatActivity {
                 .findFragmentByTag(tag))
                 .deleteSelf();
     }
+
+
 }

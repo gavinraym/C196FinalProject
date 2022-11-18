@@ -19,10 +19,30 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
+
+
+    <string name="term_list_header">List of Terms</string>
+    <string name="term_list_description">Click on term title to edit and view.</string>
+
+    <string name="detail_term_header">Detailed term view</string>
+    <string name="detail_term_description">Edit term data and save.</string>
+    <string name="class_list_header">List of Classes</string>
+    <string name="class_list_description">Click on class title to edit and view.</string>
+
+    <string name="assmnt_list_header">List of Assessments</string>
+    <string name="assmnt_list_description">These detail views are editable.</string>
+    <string name="note_list_header">List of Notes</string>
+    <string name="note_list_description">These detail views are editable.</string>
+
+    <string name="detail_course_header">Course detail view.</string>
+    <string name="detail_course_description">Edit course data and save.</string>
+
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string name="detail_term_header">Set term data here!</string>
+
+
+
     <string name="save">Save</string>
     <string name="create_course">Add Class</string>
 
@@ -31,9 +51,9 @@
     <string name="term_appbar_title">Term Details</string>
     <string name="back">Back</string>
 
-    <string name="title_activity_course">Course Detail View</string>
-    <string name="course_detail_header">Edit course data here:</string>
-    <string name="course_additions_header">Add assessments and notes:</string>
+    <string name="title_activity_course">Course</string>
+    <string name="course_detail_header">Course Detail View:</string>
+    <string name="course_additions_header">Assessments and notes:</string>
     <string name="course_title">Title:</string>
     <string name="course_start">Start date:</string>
     <string name="course_end">End date:</string>
@@ -50,8 +70,8 @@
         <item>O</item>
         <item>p</item>
     </string-array>
-    <string name="add_assmnt">+Assmnt</string>
-    <string name="add_note">+Note</string>
+    <string name="add_assmnt">Add Assessmnt</string>
+    <string name="add_note">Add Note</string>
     <string name="set_alert">Set Alert</string>
     <string name="send_sms">Send SMS</string>
 </resources>

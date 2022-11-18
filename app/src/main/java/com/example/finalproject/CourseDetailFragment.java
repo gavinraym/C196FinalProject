@@ -12,12 +12,19 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.finalproject.databinding.FragmentCourseDetailBinding;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 
 public class CourseDetailFragment extends Fragment {
@@ -68,6 +75,12 @@ public class CourseDetailFragment extends Fragment {
                 ((CourseActivity)getActivity()).createNewNote();
             }
         });
+        binding.courseAlertButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setAlert();
+            }
+        });
     }
 
     @Override
@@ -105,53 +118,51 @@ public class CourseDetailFragment extends Fragment {
         emailEditText.setText(bundle.getString("email"));
     }
 
+    private boolean sendAlertRequest(String dateString, String title, String message) {
+        Long notifyAt = 0L;
+        try {
+            LocalDate date = LocalDate.parse(dateString);
+            LocalTime time = LocalTime.now().plusMinutes(2);
+            LocalDateTime dateTime = LocalDateTime.of(date, time);
+            ZonedDateTime zoneDateTime = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+            notifyAt = zoneDateTime.toInstant().toEpochMilli();
+            Log.d("AssessmentFragment","Alert button click.");
+        } catch (Exception e) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("There was an issue with the date. Please format " +
+                    "as yyyy-mm-dd");
+            builder.create().show();
+            return false;
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString("title",title);
+        bundle.putString("message",message);
+        bundle.putLong("notifyAt",notifyAt);
+
+        DBManager.getInstance(getContext()).scheduleNotification(bundle);
+        return true;
+    }
 
     public void setAlert() {
         Log.d("CourseDetailFragment", "Set alert.");
-        Boolean alertSuccess;
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-mm");
-            Calendar date = Calendar.getInstance();
-            date.setTime(formatter.parse(binding.editStartText.getText().toString()));
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "0")
-                    .setContentTitle("A course starts today!")
-                    .setContentText(binding.editTitleText.getText().toString())
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                    .setWhen(date.getTimeInMillis());
-            alertSuccess = true;
-        } catch (Exception e) {
-            alertSuccess= false;        }
-
-        String message;
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-mm");
-            Calendar date = Calendar.getInstance();
-            date.setTime(formatter.parse(binding.editEndText.getText().toString()));
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "0")
-                    .setContentTitle("A course ends today!")
-                    .setContentText(binding.editTitleText.getText().toString())
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                    .setWhen(date.getTimeInMillis());
-
-            if (alertSuccess) {
-                message = "Notifications have been set for start and end times.";
-            } else {
-                message = "A notification was only set for course end" +
-                        " date. Try formatting date as yyyy-dd-mm";
-            }
-
-        } catch (Exception e) {
-            if (alertSuccess) { message = "A notification was only set for course start" +
-                    " date. Try formatting date as yyyy-dd-mm"; }
-            else {
-                message = "Cannot set alerts; try formatting date as yyyy-dd-mm.";
-            }
+        if (sendAlertRequest(
+                binding.editStartText.getText().toString(),
+                "Your course is starting:",
+                binding.editTitleText.getText().toString()
+        ) &
+        sendAlertRequest(
+                binding.editEndText.getText().toString(),
+                "Your course is ending:",
+                binding.editTitleText.getText().toString()
+        )) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("Your alerts were scheduled successfully.");
+            builder.create().show();
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage(message);
-        builder.create().show();
+
+
+
     }
 
 

@@ -12,7 +12,15 @@ import android.view.ViewGroup;
 import com.example.finalproject.databinding.FragmentAssessmnentBinding;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Locale;
 
 
 /**
@@ -102,31 +110,33 @@ public class AssessmnentFragment extends Fragment {
         bundle.putString("title",binding.editAssmntTitle.getText().toString());
         bundle.putString("end",binding.editAssmntDate.getText().toString());
         Log.d("AssmntFragment", "Save button click.");
-        ((CourseActivity)getActivity()).receiveAssmentDataForDB(bundle);
-
-
+        DBManager.getInstance(getActivity()).updateAssessment(bundle);
     }
 
     public void alertButtonClick(View view) {
         Log.d("AssmntFragment", "Alert button click.");
-        String message;
+        Long notifyAt = 0L;
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-mm");
-            Calendar date = Calendar.getInstance();
-            date.setTime(formatter.parse(binding.editAssmntDate.getText().toString()));
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "0")
-                    .setContentTitle("An assessment is due today!")
-                    .setContentText(this.title)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                    .setWhen(date.getTimeInMillis());
-            message = "Notification set.";
+            LocalDate date = LocalDate.parse(binding.editAssmntDate.getText().toString());
+            LocalTime time = LocalTime.now().plusMinutes(2);
+            LocalDateTime dateTime = LocalDateTime.of(date, time);
+            ZonedDateTime zoneDateTime = ZonedDateTime.of(dateTime, ZoneId.systemDefault());
+            notifyAt = zoneDateTime.toInstant().toEpochMilli();
+            Log.d("AssessmentFragment","Alert button click.");
         } catch (Exception e) {
-            message = "Cannot set alert; try formatting date as yyyy-dd-mm.";
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("There was an issue with the date. Please format " +
+                    "as yyyy-mm-dd");
+            builder.create().show();
+            return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage(message);
-        builder.create().show();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("title","An assignment is due:");
+        bundle.putString("message",binding.editAssmntTitle.getText().toString());
+        bundle.putLong("notifyAt",notifyAt);
+
+        DBManager.getInstance(getContext()).scheduleNotification(bundle);
     }
 
     public void deleteButtonClick(View view) {
