@@ -19,7 +19,8 @@
         <activity
             android:name=".CourseActivity"
             android:exported="false"
-            android:label="@string/title_activity_course">
+            android:label="Course Detail View"
+            >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -27,7 +28,8 @@
         <activity
             android:name=".TermActivity"
             android:exported="false"
-            android:label="@string/title_activity_term">
+            android:label="@string/title_activity_term"
+            >
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

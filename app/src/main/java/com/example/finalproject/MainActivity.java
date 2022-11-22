@@ -11,6 +11,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         ((LinearLayout) findViewById(R.id.snapshotLinearLayout)).removeAllViews();
         DBManager.getInstance(this).getAllTerms();
     }
+
 
     public void createNewTerm(Bundle bundle) {
         Log.d("MainActivity","Create new term");

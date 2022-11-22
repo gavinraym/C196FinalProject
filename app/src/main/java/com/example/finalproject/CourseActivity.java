@@ -9,6 +9,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.example.finalproject.databinding.ActivityCourseBinding;
 
@@ -21,6 +23,7 @@ public class CourseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.d("CourseActivity","On create.");
         binding = ActivityCourseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -36,6 +39,23 @@ public class CourseActivity extends AppCompatActivity {
         Log.d("CourseActivity","On create finished,");
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.appbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_back:
+                Log.d("CourseActivity","Quit called from action bar");
+                finishAndRemoveTask();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public void setCourseDetailFragment(CourseDetailFragment fragment) {
         this.courseDetailFragment = fragment;

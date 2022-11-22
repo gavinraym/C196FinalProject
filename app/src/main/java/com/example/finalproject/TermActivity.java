@@ -8,6 +8,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -54,6 +56,24 @@ public class TermActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         DBManager.getInstance(this).getAllCoursesData(this.termId);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.appbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_back:
+                Log.d("CourseActivity","Back called from action bar");
+                finishAndRemoveTask();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void setTermDetailFragment(TermDetailFragment fragment) {
